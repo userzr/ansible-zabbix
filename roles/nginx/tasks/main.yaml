@@ -1,0 +1,52 @@
+---
+- name: Create Tmp Directories
+  file:
+    path: "{{ unarchive_dir }}"
+    state: directory
+    recurse: yes
+
+- name: Copy And Unarchive Nginx Engine
+  unarchive:
+    src: "{{ nginx_release }}"
+    dest: "{{ unarchive_dir }}"
+
+- name: Create Nginx Group
+  group:
+    name: "{{ nginx_group }}"
+    state: present
+
+- name: Create Nginx User
+  user:
+    name: "{{ nginx_user }}"
+    group: "{{ nginx_group }}"
+    createhome: no
+    shell: /sbin/nologin
+    state: present
+
+- name: Configure Nginx
+  shell: "./configure --prefix={{ nginx_install_dir }} --sbin-path={{ nginx_sbin_path }} --user={{ nginx_user }} --group={{ nginx_group }} --with-http_ssl_module --with-http_gzip_static_module"
+  args:
+    chdir: "{{ unarchive_dir }}/nginx-1.8.1"
+    
+- name: Make Nginx
+  shell: "make"
+  args:
+    chdir: "{{ unarchive_dir }}/nginx-1.8.1"
+
+- name: Make Install Nginx
+  shell: "make install"
+  args:
+    chdir: "{{ unarchive_dir }}/nginx-1.8.1"
+
+- name: Copy Nginx Start Script
+  template:
+    src: nginx.j2
+    dest: "{{ nginx_start_script_dir }}"
+    mode: 0655
+
+- name: Start nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+

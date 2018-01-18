@@ -1,0 +1,41 @@
+---
+- name: install basic software
+  yum:
+    name: gcc
+    state: latest
+
+- name: create group test
+  group:
+    name: zabbix
+    state: present
+
+- name: create user test
+  user:
+    name: zabbix
+    group: zabbix
+    createhome: no
+    shell: /sbin/nologin
+    state: present
+
+- name: create tmp directories
+  file:
+    path: "{{ unarchive_dir }}"
+    state: directory
+    recurse: yes
+
+- name: copy and unarchive zabbix engine
+  unarchive:
+    src: "../../zabbix_server/files/{{ zabbix_release }}"
+    dest: "{{ unarchive_dir }}"
+
+- name: copy zabbix_install_script
+  template:
+    src: zabbix_agentd_install.sh.j2
+    dest: "{{ zabbix_tmp_dir }}/zabbix_agentd_install.sh"
+    mode: 0655
+
+- name: run install script
+  shell: "{{ zabbix_tmp_dir }}/zabbix_agentd_install.sh"
+
+- name: start zabbix_agentd
+  shell: "{{ zabbix_install_dir }}/sbin/zabbix_agentd"

@@ -1,0 +1,26 @@
+---
+zabbix_server_ip: 172.16.80.101
+unarchive_dir: "/opt/tools"
+zabbix_tmp_dir: "/tmp"
+mysql_config_dir: "/usr/bin/mysql_config"
+
+nginx_release: nginx-1.8.1.tar.gz
+nginx_install_dir: /usr/local/nginx
+nginx_sbin_path: /usr/sbin/nginx
+nginx_user: www
+nginx_group: www
+nginx_start_script_dir: /etc/init.d/nginx
+
+php_release: php-5.6.13.tar.gz
+php_install_dir: /usr/local/php
+php_user: www
+php_group: www
+php-fpm-pid: "run/php-fpm.pid"
+
+zabbix_release: zabbix-3.0.10.tar.gz
+zabbix_install_dir: /usr/local/zabbix
+zabbix_log_dir: /var/log/zabbix
+zabbix_db_host: localhost
+zabbix_db_user: zabbix
+zabbix_db_pass: zabbix
+zabbix_db_name: zabbix

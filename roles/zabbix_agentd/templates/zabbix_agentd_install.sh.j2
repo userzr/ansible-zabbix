@@ -1,0 +1,9 @@
+#!/bin/bash
+ipadd={{ zabbix_server_ip }}
+na={{ host_name }}
+cd {{ unarchive_dir }}/zabbix-3.0.10
+./configure --prefix={{ zabbix_install_dir }} --enable-agent >/dev/null 2>&1 && make >/dev/null 2>&1 && make install >/dev/null 2>&1
+echo "seding"
+sed -i "s/Server=127.0.0.1/Server=$ipadd/g" {{ zabbix_install_dir }}/etc/zabbix_agentd.conf
+sed -i "s/ServerActive=127.0.0.1/ServerActive=$ipadd/g" {{ zabbix_install_dir }}//etc/zabbix_agentd.conf
+sed -i "s/Hostname=Zabbix server/Hostname=$na/g" {{ zabbix_install_dir }}//etc/zabbix_agentd.conf

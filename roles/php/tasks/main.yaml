@@ -1,0 +1,85 @@
+---
+- name: Create PHP Group
+  group:
+    name: "{{ php_group }}"
+    state: present
+
+- name: Create PHP User
+  user:
+    name: "{{ php_user }}"
+    group: "{{ nginx_group }}"
+    createhome: no
+    shell: /sbin/nologin
+    state: present
+
+- name: Copy And Unarchive PHP Engine
+  unarchive:
+    src: "{{ php_release }}"
+    dest: "{{ unarchive_dir }}"
+
+- name: Configure PHP
+  shell: "./configure --prefix={{ php_install_dir }} --with-curl --with-bz2 --with-zlib --with-mhash --with-pcre-regex --with-mysqli=mysqlnd --with-mysql=mysqlnd --with-gd --with-jpeg-dir --with-png-dir --with-openssl --with-pdo-mysql --with-libxml-dir --with-freetype-dir --with-iconv --enable-opcache --enable-bcmath  --enable-ftp --enable-shmop --enable-fpm --enable-sockets --enable-sysvsem --enable-sysvshm --enable-pcntl --enable-mbregex --enable-calendar --enable-zip --enable-mbstring --enable-pdo --with-gettext"
+  args:
+    chdir: "{{ unarchive_dir }}/php-5.6.13"
+
+- name: Make PHP
+  shell: "make -j4"
+  args:
+    chdir: "{{ unarchive_dir }}/php-5.6.13"
+
+- name: Make Install PHP
+  shell: "make install"
+  args:
+    chdir: "{{ unarchive_dir }}/php-5.6.13"
+
+- name: Copy php-fpm.conf
+  shell: "cp php-fpm.conf.default php-fpm.conf"
+  args:
+    chdir: "{{ php_install_dir }}/etc/"
+- name: Modify php-fpm.conf user
+  lineinfile: "dest={{ php_install_dir }}/etc/php-fpm.conf state=present regexp='^user = ' line='user = {{ php_user }}'"
+
+- name: Modify php-fpm.conf group
+  lineinfile: "dest={{ php_install_dir }}/etc/php-fpm.conf state=present regexp='^group = ' line='group = {{ php_user }}'"
+
+- name: Modify php-fpm.conf pid
+  lineinfile: "dest={{ php_install_dir }}/etc/php-fpm.conf state=present regexp='^;pid = ' line='pid = run/php-fpm.pid'"
+
+- name: Copy php.ini
+  template:
+    src: php.ini.j2
+    dest: "{{ php_install_dir }}/lib/php.ini"
+    mode: 0644
+
+
+- name: Copy php-fpm Start Script
+  shell: "cp {{ unarchive_dir }}/php-5.6.13/sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm"
+
+- name: chmod +x php-fpm
+  file:
+    path: /etc/init.d/php-fpm
+    mode: 0655
+
+- name: Copy nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_install_dir }}/conf/nginx.conf"
+    mode: 0644
+
+- name: Copy index.php
+  template:
+    src: index.php.j2
+    dest: "{{ nginx_install_dir }}/html/index.php"
+    mode: 0644
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+
+- name: Start php-fpm
+  service:
+    name: php-fpm
+    state: restarted
+    enabled: yes

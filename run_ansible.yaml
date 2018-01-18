@@ -1,0 +1,36 @@
+---
+- name: Install Basic Software
+  tags: install basic software
+  hosts: zabbix_server
+  roles:
+    - role: basic_software
+
+- name: Install Nginx
+  tags: install nginx
+  hosts: zabbix_server
+  roles:
+    - role: nginx
+
+- name: Install Mysql
+  tags: install mysql
+  hosts: zabbix_server
+  roles:
+    - role: mysql
+
+- name: Install PHP
+  tags: install php
+  hosts: zabbix_server
+  roles:
+    - role: php
+
+- name: Install Zabbix Server
+  tags: install zabbix server
+  hosts: zabbix_server
+  roles:
+    - role: zabbix_server
+
+- name: Install Zabbix Agentd
+  tags: install zabbix agentd
+  hosts: zabbix_agentd
+  roles:
+    - role: zabbix_agentd

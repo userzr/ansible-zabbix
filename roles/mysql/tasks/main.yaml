@@ -1,0 +1,24 @@
+---
+- name: Install mysql-server
+  yum:
+    name: mysql-server
+    state: latest
+
+- name: Start mysql
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: link mysql lib
+  file:
+    src: "/usr/lib64/mysql/{{ item.src }}"
+    dest: "/usr/lib64/mysql/{{ item.dest }}"
+    state: link
+  with_items:
+    - { src: "libmysqlclient.so.16.0.0", dest: "libmysqlclient.so"}
+    - { src: "libmysqlclient_r.so.16.0.0", dest: "libmysqlclient_r.so"}
+
+
+ 
+

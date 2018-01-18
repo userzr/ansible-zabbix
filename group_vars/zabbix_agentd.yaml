@@ -1,0 +1,6 @@
+---
+zabbix_server_ip: 172.16.80.101
+unarchive_dir: "/opt/tools"
+zabbix_tmp_dir: "/tmp"
+zabbix_release: zabbix-3.0.10.tar.gz
+zabbix_install_dir: /usr/local/zabbix
